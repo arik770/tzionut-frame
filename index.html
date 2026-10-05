@@ -132,7 +132,7 @@ const S = 1080, U = S/800;           // frame drawn in 800-unit design space, ou
 const BAR_TOP = 519;
 const G = {top:385, w:537, h:312, cL:20, cR:535};
 const G_MIN = -G.cL, G_MAX = 800 - G.cR, G_CENTER = (800 - (G.cR - G.cL))/2 - G.cL;
-const SNAP = 7;
+const SNAP_PX = 14;   // snap-to-centre distance, in screen pixels under the finger
 const G_DEFAULT = 41;   // default position of note+logo (design units)
 
 const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
@@ -230,7 +230,7 @@ function hitsGroup(p){
 function moveGroup(dxDesign){
   rawGx = Math.min(G_MAX, Math.max(G_MIN, rawGx + dxDesign));
   const was = isCentered();
-  gx = Math.abs(rawGx - G_CENTER) < SNAP ? G_CENTER : rawGx;
+  gx = Math.abs(rawGx - G_CENTER) < SNAP_PX*800/stage.getBoundingClientRect().width ? G_CENTER : rawGx;
   if(!was && isCentered() && navigator.vibrate) { try{ navigator.vibrate(12); }catch(_){} }
   draw(true);
 }
@@ -255,7 +255,7 @@ stage.addEventListener('pointermove', e => {
     const was = photoCentered();
     rawCx -= (now.x-prev.x)*k; cy -= (now.y-prev.y)*k;
     cx = rawCx; clamp(); rawCx = cx;
-    if(Math.abs(cx - photo.width/2)*base*z < SNAP*U) cx = photo.width/2;
+    if(Math.abs(cx - photo.width/2)*base*z < SNAP_PX*unit()) cx = photo.width/2;
     if(!was && photoCentered() && navigator.vibrate) { try{ navigator.vibrate(12); }catch(_){} }
     draw('photo');
   } else if(pts.size === 2 && pinch0){
